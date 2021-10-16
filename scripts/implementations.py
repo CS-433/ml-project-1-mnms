@@ -35,6 +35,33 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     return w, loss
 
 
+def least_squares_GD_complete(y, tx, initial_w, max_iters, gamma):
+    """Linear regression using the gradient descent algorithm."""
+
+    w = initial_w
+    
+    ws = [initial_w]
+    losses = []
+
+    # repeat gradient descent max_iters times
+    # the last value of w is the most optimized one
+    for _ in range(max_iters):
+        loss = compute_loss(y, tx, w)
+        gradient = compute_gradient(y, tx, w)
+
+        # update w by gradient
+        w = w - gamma*gradient
+        
+        # store w and loss
+        ws.append(w)
+        losses.append(loss)
+
+    # compute the loss of the optimized w
+    loss = compute_loss(y, tx, w)
+
+    return w, loss, ws, losses
+
+
 def random_output_and_features(y, tx):
     """Return a random output y_n and corresponding feature vector x_n"""
 
@@ -94,6 +121,39 @@ def least_squares_SGD2(y, tx, initial_w, max_iters, gamma):
     loss = compute_loss(y, tx, w)
 
     return w, loss
+
+
+# TODO do not forget to remove
+def least_squares_SGD2_complete(y, tx, initial_w, max_iters, gamma):
+    """Linear regression using the stochastic gradient descent algorithm."""
+
+    w = initial_w
+    # repeat stochastic gradient descent max_iters times
+    # the last value of w is the most optimized one
+    
+    ws = [initial_w]
+    losses = []
+
+    
+    for _ in range(max_iters):
+        # here y=y_n and tx=x_n, but the same formula for computing the gradient still applies
+        rand_id = np.random.choice(len(y))
+        random_xn = tx[rand_id]
+        random_yn = y[rand_id]
+
+        gradient = compute_gradient(random_yn, random_xn, w)
+
+        # update w by gradient
+        w = w - gamma*gradient
+        
+        # store w and loss
+        ws.append(w)
+        losses.append(loss)
+
+    # compute the loss of the optimized w
+    loss = compute_loss(y, tx, w)
+
+    return w, loss, ws, losses
 
 
 def least_squares(y, tx):
