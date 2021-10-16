@@ -73,6 +73,29 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
     return w, loss
 
 
+def least_squares_SGD2(y, tx, initial_w, max_iters, gamma):
+    """Linear regression using the stochastic gradient descent algorithm."""
+
+    w = initial_w
+    # repeat stochastic gradient descent max_iters times
+    # the last value of w is the most optimized one
+    for _ in range(max_iters):
+        # here y=y_n and tx=x_n, but the same formula for computing the gradient still applies
+        rand_id = np.random.choice(len(y))
+        random_xn = tx[rand_id]
+        random_yn = y[rand_id]
+
+        gradient = compute_gradient(random_yn, random_xn, w)
+
+        # update w by gradient
+        w = w - gamma*gradient
+
+    # compute the loss of the optimized w
+    loss = compute_loss(y, tx, w)
+
+    return w, loss
+
+
 def least_squares(y, tx):
     """Calculate the least squares solution using normal equations"""
 
