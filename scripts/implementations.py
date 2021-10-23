@@ -15,9 +15,12 @@ def compute_gradient(y, tx, w):
     e = y - tx @ w
     return -1/N * tx.T @ e
 
+
 def compute_gradient_SGD(y, tx, w):
+    """Compute the gradient for the SGD."""
     e = y - tx @ w
     return - tx.T * e
+
 
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     """Linear regression using the gradient descent algorithm."""
@@ -73,12 +76,11 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
     # repeat stochastic gradient descent max_iters times
     # the last value of w is the most optimized one
     for _ in range(max_iters):
-        
+        #choose random item
         rand_id = np.random.choice(len(y))
         random_xn = tx[rand_id]
         random_yn = y[rand_id]
-
-        # here y=y_n and tx=x_n, but the same formula for computing the gradient still applies
+        
         gradient = compute_gradient_SGD(random_yn, random_xn, w)
 
         # update w by gradient
@@ -102,8 +104,9 @@ def least_squares_SGD_complete(y, tx, initial_w, max_iters, gamma):
     # repeat stochastic gradient descent max_iters times
     # the last value of w is the most optimized one
     for _ in range(max_iters):
-        # here y=y_n and tx=x_n, but the same formula for computing the gradient still applies
-        random_yn, random_xn = random_output_and_features(y, tx)
+        rand_id = np.random.choice(len(y))
+        random_xn = tx[rand_id]
+        random_yn = y[rand_id]
 
         gradient = compute_gradient_SGD(random_yn, random_xn, w)
         loss = compute_loss(y, tx, w)
