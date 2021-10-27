@@ -112,7 +112,7 @@ def least_squares_SGD_complete(y, tx, initial_w, max_iters, gamma):
         loss = compute_loss(y, tx, w)
 
         # update w by gradient
-        w = w - gamma*gradient
+        w = w - gamma * gradient
         
         # store w and loss
         ws.append(w)
@@ -147,5 +147,63 @@ def ridge_regression(y, tx, lambda_):
     # solve the linear system to find w
     w = np.linalg.solve(A, b)
     loss = compute_loss(y, tx, w)
+
+    return w, loss
+
+
+def sigmoid(t):
+    """apply the sigmoid function on t."""
+    return 1 / (1 + np.exp(-t))
+
+
+def calculate_loss_logistic_regression(y, tx, w):
+    """compute the loss for logistic regression: negative log likelihood."""
+    prediction = sigmoid(tx @ w)
+    left_term = y.T @ np.log(prediction).reshape(-1)
+    right_term = (1 - y).T @ np.log(1 - prediction).reshape(-1)
+    return - (left_term + right_term)
+
+
+def calculate_gradient_logistic_regression(y, tx, w):
+    """compute the gradient of loss for logistic regression."""
+    prediction = sigmoid(tx @ w)
+    return tx.T @ (prediction - y)
+
+
+def logistic_regression(y, tx, initial_w, max_iters, gamma):
+    """logistic regression using gradient descent."""
+    w = initial_w
+
+    # repeat gradient descent max_iters times
+    # the last value of w is the most optimized one
+    for _ in range(max_iters):
+        gradient = calculate_gradient_logistic_regression(y, tx, w)
+
+        # update w by gradient
+        w = w - gamma * gradient
+
+    # compute the loss of the optimized w
+    loss = calculate_loss_logistic_regression(y, tx, w)
+
+    return w, loss
+
+
+def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
+    """regularized logistic regression using gradient descent"""
+    w = initial_w
+
+    # repeat gradient descent max_iters times
+    # the last value of w is the most optimized one
+    for _ in range(max_iters):
+        #add the regularization term
+        gradient = calculate_gradient_logistic_regression(y, tx, w) + 2 * lambda_ * w
+
+        # update w by gradient
+        w = w - gamma * gradient
+        
+    #compute norm of w
+    w_norm = np.linalg.norm(w)
+    # compute the loss of the optimized w, add the regularization term
+    loss = calculate_loss_logistic_regression(y, tx, w) + lambda_ * w_norm * w_norm
 
     return w, loss
