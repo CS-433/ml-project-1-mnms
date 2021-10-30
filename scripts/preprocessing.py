@@ -62,14 +62,18 @@ def standardize(tx):
     return tx
 
 
-#TODO do all your needed preprocessing functions inside this function
+# do all your needed preprocessing functions inside this function
 def preprocess_data(input_data):
     """Apply all preprocessing functions to the input data """
 
     preprocessed_data = replace_undefined_values_with_mean(input_data)
     preprocessed_data = remove_skewness(preprocessed_data)
     preprocessed_data = drop_phi_features(preprocessed_data)
-    preprocessed_data = add_bias_term(preprocessed_data)
     preprocessed_data = standardize(preprocessed_data)
+    preprocessed_data = add_bias_term(preprocessed_data)
 
     return preprocessed_data
+
+
+def change_11_to_01_categories(labels):
+    return np.where(labels == -1, 0, 1)

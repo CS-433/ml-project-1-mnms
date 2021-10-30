@@ -2,12 +2,31 @@
 """Additional helper functions."""
 import numpy as np
 
+# ------ sigmoid ------
+
+def sigmoid(t):
+    """apply the sigmoid function on t."""
+    t = np.clip( t, -500, 35 )
+    return 1 / (1 + np.exp(-t))
+
+
+# ------ compute loss ------
 
 def compute_loss(y, tx, w):
     """Calculate the loss using MSE."""
     e = y - tx @ w
     return 0.5*np.mean(e**2)
 
+
+def compute_loss_logistic_regression(y, tx, w):
+    """compute the loss for logistic regression: negative log likelihood."""
+    prediction = sigmoid(tx @ w)
+    left_term = y.T @ np.log(prediction).reshape(-1)
+    right_term = (1 - y).T @ np.log(1 - prediction).reshape(-1)
+    return - (left_term + right_term)
+
+
+# ------ compute gradient ------
 
 def compute_gradient(y, tx, w):
     """Compute the gradient."""
@@ -21,6 +40,14 @@ def compute_gradient_SGD(y, tx, w):
     e = y - tx @ w
     return - tx.T * e
 
+
+def compute_gradient_logistic_regression(y, tx, w):
+    """compute the gradient of loss for logistic regression."""
+    prediction = sigmoid(tx @ w)
+    return tx.T @ (prediction - y)
+
+
+# ------ ML methods ------
 
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     """Linear regression using the gradient descent algorithm."""
@@ -129,6 +156,7 @@ def least_squares(y, tx):
 
     b = tx.T @ y
     A = tx.T @ tx
+    
     # solve the linear system to find w
     w = np.linalg.solve(A, b)
     loss = compute_loss(y, tx, w)
@@ -151,41 +179,9 @@ def ridge_regression(y, tx, lambda_):
     return w, loss
 
 
-def sigmoid(t):
-    """apply the sigmoid function on t."""
-    return 1 / (1 + np.exp(-t))
-
-
-def calculate_loss_logistic_regression(y, tx, w):
-    """compute the loss for logistic regression: negative log likelihood."""
-    prediction = sigmoid(tx @ w)
-    left_term = y.T @ np.log(prediction).reshape(-1)
-    right_term = (1 - y).T @ np.log(1 - prediction).reshape(-1)
-    return - (left_term + right_term)
-
-
-def calculate_gradient_logistic_regression(y, tx, w):
-    """compute the gradient of loss for logistic regression."""
-    prediction = sigmoid(tx @ w)
-    return tx.T @ (prediction - y)
-
-
 def logistic_regression(y, tx, initial_w, max_iters, gamma):
     """logistic regression using gradient descent."""
-    w = initial_w
-
-    # repeat gradient descent max_iters times
-    # the last value of w is the most optimized one
-    for _ in range(max_iters):
-        gradient = calculate_gradient_logistic_regression(y, tx, w)
-
-        # update w by gradient
-        w = w - gamma * gradient
-
-    # compute the loss of the optimized w
-    loss = calculate_loss_logistic_regression(y, tx, w)
-
-    return w, loss
+    return reg_logistic_regression(y, tx, 0, initial_w, max_iters, gamma)
 
 
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
@@ -196,7 +192,7 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     # the last value of w is the most optimized one
     for _ in range(max_iters):
         #add the regularization term
-        gradient = calculate_gradient_logistic_regression(y, tx, w) + 2 * lambda_ * w
+        gradient = compute_gradient_logistic_regression(y, tx, w) + 2 * lambda_ * w
 
         # update w by gradient
         w = w - gamma * gradient
@@ -204,6 +200,6 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     #compute norm of w
     w_norm = np.linalg.norm(w)
     # compute the loss of the optimized w, add the regularization term
-    loss = calculate_loss_logistic_regression(y, tx, w) + lambda_ * w_norm * w_norm
+    loss = compute_loss_logistic_regression(y, tx, w) + lambda_ * w_norm * w_norm
 
     return w, loss
