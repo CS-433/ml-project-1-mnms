@@ -51,7 +51,6 @@ def compute_gradient_logistic_regression(y, tx, w):
 
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     """Linear regression using the gradient descent algorithm."""
-
     w = initial_w
 
     # repeat gradient descent max_iters times
