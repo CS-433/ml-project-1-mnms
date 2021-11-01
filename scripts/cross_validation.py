@@ -32,10 +32,25 @@ def build_k_indices(y, k_fold, seed):
                  for k in range(k_fold)]
     return np.array(k_indices)
 
+#---- rmse per model ----
+def var_rmse_ridge_reg_per_degree(y, x, k_fold, best_lambda_per_deg, seed):
+    """plots the best rmse of ridge regression per degree"""
+    k_indices = build_k_indices(y, k_fold, seed)
+    
+    rmse_te = []
+    for idx, lambda_ in enumerate(best_lambda_per_deg):
+        rmse_te_k = []
+        for k in range(k_fold):
+            _, loss_te, _ = cross_validation(y, x, k_indices, k, idx+1, 'ridge_regression', lambda_, 0, 0)
+            rmse_te_k.append(loss_te)
+        rmse_te.append(rmse_te_k)
+    return rmse_te
+        
 
 #---- error and accuracy validation ----
 
 def error_accuracy_validation(y, x, k_fold, degree, model, lambda_=0, max_iters=0, gamma=0, seed=1):
+    """computes the k errors and accuracies of a given model, using k-fold cross-validation"""
     # split data in k fold
     k_indices = build_k_indices(y, k_fold, seed)
     
@@ -53,6 +68,7 @@ def error_accuracy_validation(y, x, k_fold, degree, model, lambda_=0, max_iters=
 
 
 def accuracy_mean_std(y, x, degree, model, lambda_=0, max_iters=0, gamma=0, seed=1):
+    """computes the mean and std of accuracy of a given model, using k-fold cross-validation"""
     _, _, accs = error_validation(y, x, k_fold, degree, model, lambda_, max_iters, gamma, seed)
     
     return np.mean(accs), np.std(accs)

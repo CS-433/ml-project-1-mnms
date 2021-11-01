@@ -1,5 +1,7 @@
+scripts/.ipynb_checkpoints/
+scripts/__pycache__/
+
 data/train.csv
 data/test.csv
 
-scripts/.ipynb_checkpoints/
-scripts/__pycache__/
+*Copy*
